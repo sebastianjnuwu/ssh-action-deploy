@@ -7,13 +7,13 @@ branding:
 
 inputs:
   LOGIN:
-    description: 'Your preferred user root'
+    description: ''
     required: true
   KEY:
-    description: 'your ssh key'
+    description: ''
     required: true
   RUN: 
-    description: 'command to execute in the remote server.'
+    description: ''
     required: true
 
 runs:
