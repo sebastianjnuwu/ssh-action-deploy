@@ -26,7 +26,7 @@ runs:
       run: |
         mkdir -p ~/.ssh/
         echo "${{ inputs.KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        chmod 777 ~/.ssh/id_rsa
         
       shell: bash
     - name: 🍷 Executing commands...
