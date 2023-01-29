@@ -1,4 +1,4 @@
-name: ssh-deploy
+name: ssh-action-uwu
 description: 'Run commands on your vps after deploy'
 author: 'sebastianjnuwu'
 branding:
