@@ -21,11 +21,11 @@ runs:
   steps:
     - name: 🗿 Setting up ssh...
       run: |
-        mkdir -p ~/.ssh/
-        echo "${{ inputs.KEY }}" > ~/.ssh/id_rsa
-        chmod 777 ~/.ssh/id_rsa
+        mkdir /root/.ssh
+        echo "${{ inputs.KEY }}" > /root/.ssh/id_rsa
+        chmod 0600 /root/.ssh/id_rsa
         
       shell: bash
     - name: 🍷 Executing commands...
-      run: ssh "${{ inputs.LOGIN }}" "${{ inputs.RUN }}; exit"
+      run: ssh -o StrictHostKeyChecking=yes "${{ inputs.LOGIN }}" "${{ inputs.RUN }}; exit"
       shell: bash
