@@ -1,0 +1,38 @@
+name: ssh-deploy
+description: 'Run commands on your vps after deploy'
+author: 'sebastianjnuwu'
+branding:
+  icon: 'terminal'
+  color: 'gray-dark'
+
+inputs:
+  USER:
+    description: 'Your preferred user root'
+    required: true
+  KEY:
+    description: 'your ssh key'
+    required: true
+  IP:
+    description: 'your vps ip'
+    required: true
+  PORT:
+    description: 'port of your ssh vps'
+    default: 22
+    required: false
+  RUN: 
+    description: 'command to execute in the remote server.'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🗿 Setting up ssh...
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ inputs.KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+      shell: bash
+    - name: 🍷 Executing commands...
+      run: ssh "${{ inputs.USER@inputs.IP }}" "${{ inputs.RUN }}; exit"
+      shell: bash
