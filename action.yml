@@ -6,8 +6,11 @@ branding:
   color: 'gray-dark'
 
 inputs:
-  USER:
+  LOGIN:
     description: 'Your preferred user root'
+    required: true
+  KEY:
+    description: 'your ssh key'
     required: true
   RUN: 
     description: 'command to execute in the remote server.'
