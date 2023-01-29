@@ -1,0 +1,17 @@
+name: Action 
+on: [push]
+
+jobs:
+  build:
+    name: ✨
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🙄
+        uses: actions/checkout@v3
+      - name: ✍️
+        uses: ./
+        with:
+          LOGIN: ${{ secrets.LOGIN }}
+          KEY: ${{ secrets.KEY }}
+          RUN: ls; pwd
+          
