@@ -15,10 +15,6 @@ inputs:
   IP:
     description: 'your vps ip'
     required: true
-  PORT:
-    description: 'port of your ssh vps'
-    default: 22
-    required: false
   RUN: 
     description: 'command to execute in the remote server.'
     required: true
