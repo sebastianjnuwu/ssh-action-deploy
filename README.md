@@ -14,7 +14,19 @@
   - Easy and fast 
 
 # mode of use
-  
+
+## Warning
+
+ Read this before running <strong>ssh-action-deploy<strong>
+ 
+ • During deploy the folder you put in is cleaned.
+ 
+ • We use the default ssh port (22) to execute the deploy
+
+ • If you want to use several commands, separate them with `&` or `;`.
+
+## example
+
   It is very simple to use, see the example:
 ```yml
 # Please read the next section below before using for your own safety "variables".
