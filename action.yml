@@ -27,5 +27,5 @@ runs:
         
       shell: bash
     - name: 🍷 Executing commands...
-      run: ssh "${{ inputs.LOGIN }}" "${{ inputs.RUN }}; exit"
+      run: ssh -o StrictHostKeyChecking=no "${{ inputs.LOGIN }}" "${{ inputs.RUN }}; exit"
       shell: bash
