@@ -58,7 +58,6 @@ jobs:
   
 ## variables 
 
-  
 | variable | example  | require |
 | -------- | ----------- | ------- |
 | `IP` | `1.1.1.1`| `true` |
