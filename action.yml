@@ -21,9 +21,9 @@ runs:
   steps:
     - name: 🗿 Setting up ssh...
       run: |
-        sudo mkdir -p /root/.ssh
-        echo "${{ inputs.KEY }}" > /root/.ssh/id_rsa
-        chmod 600 /root/.ssh/id_rsa
+        mkdir -p .ssh
+        echo "${{ inputs.KEY }}" > .ssh/id_rsa
+        chmod 600 .ssh/id_rsa
         
       shell: bash
     - name: 🍷 Executing commands...
