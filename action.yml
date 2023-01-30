@@ -45,6 +45,10 @@ runs:
           StrictHostKeyChecking no
         END
       shell: bash
+    - name: ✨ Removing old files...
+      run: |
+       ssh ssh rm -rf /${{ inputs.FOLDER }}; exit
+      shell: bash 
     - name: 💧 deploy to vps...
       run: |
        cd ..
