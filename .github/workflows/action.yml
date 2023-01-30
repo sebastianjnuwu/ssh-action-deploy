@@ -13,5 +13,5 @@ jobs:
         with:
           LOGIN: ${{ secrets.LOGIN }}
           KEY: ${{ secrets.KEY }}
-          RUN: ls; pwd
+          RUN: ls; pwd; uptime 
           
