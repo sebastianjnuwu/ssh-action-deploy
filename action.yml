@@ -26,17 +26,17 @@ runs:
       run: |
         mkdir -p ~/.ssh/
         echo "${{ inputs.KEY }}" > ~/.ssh/server.key
-        chmod 600 ~/.ssh/server.key
+        chmod 600 ~/.ssh/ssh.key
         cat >>~/.ssh/config <<END
-        Host server
+        Host ssh
           HostName ${{ inputs.IP }}
           User ${{ inputs.USER }}
           Port 22
-          IdentityFile ~/.ssh/server.key
+          IdentityFile ~/.ssh/ssh.key
           StrictHostKeyChecking no
         END
         
       shell: bash
     - name: 🍷 Executing commands...
-      run: ssh server "${{ inputs.RUN }}; exit"
+      run: ssh ssh "${{ inputs.RUN }}; exit"
       shell: bash
