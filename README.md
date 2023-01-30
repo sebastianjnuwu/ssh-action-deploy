@@ -17,7 +17,7 @@
 
 ## Warning
 
- Read this before running <strong>ssh-action-deploy<strong>
+ Read this before running <strong>ssh-action-deploy</strong>
  
  • During deploy the folder you put in is cleaned.
  
