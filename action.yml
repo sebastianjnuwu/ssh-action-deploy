@@ -7,22 +7,22 @@ branding:
 
 inputs:
   IP:
-    description: ''
+    description: 'IP address is a unique address that identifies a device on the Internet or on a local network.'
     required: true
   USER:
-    description: ''
+    description: 'A user or user is an agent, either a human agent or a software agent, who uses a computer or network service.'
     required: true
   KEY:
-    description: ''
+    description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques. '
     required: true
   REPO:
-    description: ''
+    description: 'Put the name of the repository where the action is.'
     required: true
   FOLDER:
-    description: ''
+    description: 'Name of the folder where the files are located.'
     required: true
   RUN: 
-    description: ''
+    description: 'Put the commands that will be executed after the deploy.'
     required: true
 
 runs:
