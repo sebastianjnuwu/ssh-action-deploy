@@ -44,7 +44,7 @@ runs:
       shell: bash
     - name: 💧 deploy to vps...
       run: |
-       scp -r ./ ssh:${{ inputs.FOLDER }}
+       scp -r . ssh:${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}; exit"
