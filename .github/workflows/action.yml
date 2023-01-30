@@ -16,4 +16,4 @@ jobs:
           KEY: ${{ secrets.KEY }}
           REPO: 'ssh-action'
           FOLDER: '/root/.deploy'
-          RUN: 's'
+          RUN: 'neofetch'
