@@ -44,4 +44,14 @@ jobs:
           RUN: 'ls -a; pwd'
   ```
   
-# variables 
+## variables 
+
+  
+| variable | example  | require |
+| -------- | ----------- | ------- |
+| `IP` | `1.1.1.1`| `true` |
+| `USER` | `root` | `true` |
+| `KEY` | xxxxxx | `true` |
+| `REPO` | `your-repository` | `true` |
+| `FOLDER` | `user/.deploy`| `true` |
+| `RUN` | `uptime` | `true` |
