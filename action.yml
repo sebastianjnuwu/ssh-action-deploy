@@ -47,7 +47,7 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-       ssh ssh rm -rf /${{ inputs.FOLDER }}; exit
+       ssh ssh rm -rf /${{ inputs.FOLDER }}
       shell: bash 
     - name: 💧 deploy to vps...
       run: |
