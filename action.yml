@@ -48,7 +48,6 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       echo "${{ inputs.RUN }}"
        scp -r ${{ inputs.REPO }} ssh:/${{ inputs.USER }}/${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
