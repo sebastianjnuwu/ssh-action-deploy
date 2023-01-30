@@ -1,12 +1,12 @@
-name: Action 
+name: 🐥 ssh-action-deploy
 on: [push]
 
 jobs:
   build:
-    name: ✨
+    name: 🕳️ Ubuntu...
     runs-on: ubuntu-latest
     steps:
-      - name: 🐥 Github actions...
+      - name: 💞 Github actions...
         uses: actions/checkout@v3
       - name: 🌈 Deploy with ssh...
         uses: ./
