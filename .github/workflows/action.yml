@@ -16,8 +16,4 @@ jobs:
           KEY: ${{ secrets.KEY }}
           REPO: 'ssh-action'
           FOLDER: '/root/deploy'
-          RUN: 
-            - ls; 
-            - pwd;
-            - uptime 
-          
+          RUN: ["ls"]
