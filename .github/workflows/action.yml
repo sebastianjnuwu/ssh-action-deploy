@@ -14,6 +14,7 @@ jobs:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
+          REPO: 'ssh-action'
           FOLDER: '/root/deploy'
           RUN: ls; pwd; uptime 
           
