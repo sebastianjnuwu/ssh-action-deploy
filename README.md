@@ -15,6 +15,7 @@
 
 # mode of use
 
+ Worth remembering if you have any questions or suggestions just open an [issue](https://github.com/sebastianjnuwu/ssh-action-deploy/issues).
 ## Warning
 
  Read this before running <strong>ssh-action-deploy</strong>
