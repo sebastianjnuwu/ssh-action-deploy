@@ -22,11 +22,18 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 🗿 Setting up ssh...
+    - name: 🗿 Creating ssh files...
+      run: |
+        ls
+      shell: bash 
+    - name: 🗿 Creating ssh files...
       run: |
         mkdir -p ~/.ssh/
         echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
         chmod 600 ~/.ssh/ssh.key
+      shell: bash
+    - name: 🍷 Setting the ssh Key...
+      run: |
         cat >>~/.ssh/config <<END
         Host ssh
           HostName ${{ inputs.IP }}
@@ -35,7 +42,6 @@ runs:
           IdentityFile ~/.ssh/ssh.key
           StrictHostKeyChecking no
         END
-        
       shell: bash
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}; exit"
