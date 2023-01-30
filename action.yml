@@ -9,7 +9,7 @@ inputs:
   IP:
     description: ''
     required: true
-  IP:
+  USER:
     description: ''
     required: true
   KEY:
