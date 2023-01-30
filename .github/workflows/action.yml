@@ -11,7 +11,8 @@ jobs:
       - name: ✍️
         uses: ./
         with:
-          LOGIN: ${{ secrets.LOGIN }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
           RUN: ls; pwd; uptime 
           
