@@ -47,7 +47,7 @@ jobs:
       - name: 💞 Github actions...
         uses: actions/checkout@v3
       - name: 🌈 Deploy with ssh...
-        uses: sebastianjnuwu@ssh-action-deploy@action
+        uses: sebastianjnuwu/ssh-action-deploy@action
         with:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
