@@ -15,5 +15,5 @@ jobs:
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
           REPO: 'ssh-action'
-          FOLDER: '/root/.deploy'
+          FOLDER: 'root/.deploy'
           RUN: ''
