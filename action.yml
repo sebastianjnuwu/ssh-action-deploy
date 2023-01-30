@@ -48,7 +48,7 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       ssh ssh cd /${{ inputs.USER }}/${{ inputs.FOLDER }}/.sftp && rm -rf *
+ #      ssh ssh cd /${{ inputs.USER }}/${{ inputs.FOLDER }}/.sftp && rm -rf *
        scp -r ${{ inputs.REPO }} ssh:/${{ inputs.USER }}/${{ inputs.FOLDER }}/.sftp
       shell: bash 
     - name: 🍷 Executing commands...
