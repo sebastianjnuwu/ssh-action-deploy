@@ -25,7 +25,7 @@ runs:
     - name: 🗿 Setting up ssh...
       run: |
         mkdir -p ~/.ssh/
-        echo "${{ inputs.KEY }}" > ~/.ssh/server.key
+        echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
         chmod 600 ~/.ssh/ssh.key
         cat >>~/.ssh/config <<END
         Host ssh
