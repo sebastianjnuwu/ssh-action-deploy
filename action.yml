@@ -55,5 +55,5 @@ runs:
        scp -r ${{ inputs.REPO }} ssh:/${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
-      run: ssh ssh "${{ inputs.RUN }}; exit"
+      run: ssh ssh "${{ inputs.RUN }}"
       shell: bash
