@@ -6,7 +6,10 @@ branding:
   color: 'gray-dark'
 
 inputs:
-  LOGIN:
+  IP:
+    description: ''
+    required: true
+  IP:
     description: ''
     required: true
   KEY:
@@ -21,11 +24,19 @@ runs:
   steps:
     - name: 🗿 Setting up ssh...
       run: |
-        mkdir -p .ssh
-        echo "${{ inputs.KEY }}" > .ssh/id_rsa
-        chmod 600 .ssh/id_rsa
+        mkdir -p ~/.ssh/
+        echo "${{ inputs.KEY }}" > ~/.ssh/server.key
+        chmod 600 ~/.ssh/server.key
+        cat >>~/.ssh/config <<END
+        Host server
+          HostName ${{ inputs.IP }}
+          User ${{ inputs.USER }}
+          Port 22
+          IdentityFile ~/.ssh/server.key
+          StrictHostKeyChecking no
+        END
         
       shell: bash
     - name: 🍷 Executing commands...
-      run: ssh -o StrictHostKeyChecking=no "${{ inputs.LOGIN }}" "${{ inputs.RUN }}; exit"
+      run: ssh server "${{ inputs.RUN }}; exit"
       shell: bash
