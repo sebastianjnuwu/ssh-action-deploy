@@ -3,7 +3,7 @@ description: 'Deploy has never been so easy running commands even less...'
 author: 'sebastianjnuwu'
 branding:
   icon: 'terminal'
-  color: 'gray-dark'
+  color: 'purple'
 
 inputs:
   IP:
