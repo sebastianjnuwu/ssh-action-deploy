@@ -17,8 +17,7 @@
   
   It is very simple to use, see the example:
 ```yml
-# Please read the next section below before using for your own safety.
-# variables: 
+# Please read the next section below before using for your own safety "variables".
 name: 🐥 ssh-action-deploy
 
 on:
