@@ -8,11 +8,12 @@ jobs:
     steps:
       - name: 🐥 Github actions...
         uses: actions/checkout@v3
-      - name: 🌈 Deploy with ssh
+      - name: 🌈 Deploy with ssh...
         uses: ./
-        env:
+        with:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
+          FOLDER: '/root/deploy'
           RUN: ls; pwd; uptime 
           
