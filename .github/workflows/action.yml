@@ -6,9 +6,9 @@ jobs:
     name: ✨
     runs-on: ubuntu-latest
     steps:
-      - name: 🙄
+      - name: 🐥 Github actions...
         uses: actions/checkout@v3
-      - name: ✍️
+      - name: 🌈 Deploy with ssh
         uses: ./
         env:
           IP: ${{ secrets.IP }}
