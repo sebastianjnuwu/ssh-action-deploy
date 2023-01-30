@@ -5,3 +5,10 @@
   <br>
   <smail>"What you were looking for all this time to be here, deploy your application"</smail>
 </p>
+
+# About
+
+ Deploy your application to vps over ssh quickly and easily using github actions...<br>
+  - Deploy your application 
+  - Execute commands
+  - Easy and fast 
