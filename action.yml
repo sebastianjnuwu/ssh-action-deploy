@@ -15,6 +15,9 @@ inputs:
   KEY:
     description: ''
     required: true
+  REPO:
+    description: ''
+    required: true
   FOLDER:
     description: ''
     required: true
@@ -45,8 +48,7 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       ls
-       scp -r ./ ssh:${{ inputs.FOLDER }}
+       scp -r ${{ inputs.REPO }} ssh:${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}; exit"
