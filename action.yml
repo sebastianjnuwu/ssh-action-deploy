@@ -44,6 +44,8 @@ runs:
       shell: bash
     - name: 💧 deploy to vps...
       run: |
+       cd ..
+       ls
        scp -r ./ ssh:${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
