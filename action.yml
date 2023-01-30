@@ -1,5 +1,5 @@
-name: ssh-action-uwu
-description: 'Run commands on your vps after deploy'
+name: ssh-action-deploy
+description: 'Deploy has never been so easy running commands even less...'
 author: 'sebastianjnuwu'
 branding:
   icon: 'terminal'
