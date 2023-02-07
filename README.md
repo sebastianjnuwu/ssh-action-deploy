@@ -47,12 +47,11 @@ jobs:
       - name: 💞 Github actions...
         uses: actions/checkout@v3
       - name: 🌈 Deploy with ssh...
-        uses: sebastianjnuwu/ssh-action-deploy@action
+        uses: sebastianjnuwu/ssh-action-deploy@v1
         with:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
-          REPO: 'ssh-action-deploy'
           FOLDER: 'root/.deploy'
           RUN: 'ls -a; pwd'
   ```
@@ -64,6 +63,5 @@ jobs:
 | `IP` | `1.1.1.1`| `true` |
 | `USER` | `root` | `true` |
 | `KEY` | xxxxxx | `true` |
-| `REPO` | `your-repository` | `true` |
 | `FOLDER` | `user/.deploy`| `true` |
 | `RUN` | `uptime` | `true` |
