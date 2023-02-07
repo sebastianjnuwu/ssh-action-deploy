@@ -15,9 +15,6 @@ inputs:
   KEY:
     description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques. '
     required: true
-  REPO:
-    description: 'Put the name of the repository where the action is.'
-    required: true
   FOLDER:
     description: 'Name of the folder where the files are located.'
     required: true
