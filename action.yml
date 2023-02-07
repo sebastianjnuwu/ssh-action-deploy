@@ -17,7 +17,7 @@ inputs:
     required: true
   REPO:
     description: 'Put the name of the repository where the action is.'
-    required: true
+    default: ${{ github.repository }}
   FOLDER:
     description: 'Name of the folder where the files are located.'
     required: true
@@ -52,7 +52,10 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       scp -r ${{ inputs.REPO }} ssh:/${{ inputs.FOLDER }}
+       IN="${{ inputs.REPO }}"
+       set -- "$IN" 
+       IFS="/"; declare -a Array=($*) 
+       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}"
