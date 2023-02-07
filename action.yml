@@ -52,7 +52,7 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       IN= "${{ inputs.REPO }}"
+       IN="${{ inputs.REPO }}"
        set -- "$IN" 
        IFS="/"; declare -a Array=($*) 
        echo "${Array[1]}"
