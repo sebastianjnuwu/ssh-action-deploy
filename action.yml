@@ -55,7 +55,7 @@ runs:
        IN="${{ inputs.REPO }}"
        set -- "$IN" 
        IFS="/"; declare -a Array=($*) 
-       echo "${Array[1]}"
+       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}"
