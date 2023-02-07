@@ -49,7 +49,10 @@ runs:
     - name: 💧 deploy to vps...
       run: |
        cd ..
-       scp -r ${{ inputs.REPO }} ssh:/${{ inputs.FOLDER }}
+       IN="action/uwu" 
+       set -- "$IN" 
+       IFS="/"; declare -a Array=($*) 
+       echo "${Array[0]}"
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}"
