@@ -52,7 +52,7 @@ runs:
        IN="action/uwu" 
        set -- "$IN" 
        IFS="/"; declare -a Array=($*) 
-       echo "${Array[2]}"
+       echo "${Array[1]}"
       shell: bash 
     - name: 🍷 Executing commands...
       run: ssh ssh "${{ inputs.RUN }}"
