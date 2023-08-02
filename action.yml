@@ -23,7 +23,7 @@ inputs:
     required: true
   RUN: 
     description: 'Put the commands that will be executed after the deploy.'
-    required: true
+    required: false  # Set to false to make the input optional.
 
 runs:
   using: 'composite'
@@ -58,5 +58,7 @@ runs:
        scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
       shell: bash 
     - name: 🍷 Executing commands...
+      if: ${{ inputs.RUN }}  # Add this condition to run the step only if RUN is provided.
       run: ssh ssh "${{ inputs.RUN }}"
       shell: bash
+      
