@@ -64,4 +64,4 @@ jobs:
 | `USER` | `root` | `true` |
 | `KEY` | xxxxxx | `true` |
 | `FOLDER` | `user/.deploy`| `true` |
-| `RUN` | `uptime` | `true` |
+| `RUN` | `uptime` | `false` |
