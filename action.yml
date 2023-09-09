@@ -12,9 +12,12 @@ inputs:
   USER:
     description: "An agent, which can be a human or software agent, using a computer or network service."
     required: true
+  PASSWORLD: 
+    description: ""
+    required: false
   KEY:
     description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
-    required: true
+    required: false
   REPO:
     description: "The name of the repository where the action is located (default: the GitHub repository)."
     default: ${{ github.repository }}
@@ -32,8 +35,13 @@ runs:
     - name: 🗿 Creating ssh files...
       run: |
         mkdir -p ~/.ssh/
-        echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
-        chmod 600 ~/.ssh/ssh.key
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
+          chmod 600 ~/.ssh/ssh.key
+        fi
+        if [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          echo "PasswordAuthentication yes" > ~/.ssh/config
+        fi
       shell: bash
     - name: 🍷 Setting the ssh Key...
       run: |
