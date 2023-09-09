@@ -49,13 +49,14 @@ runs:
       run: |
         ssh ssh rm -rf "${{ inputs.FOLDER }}"; 
       shell: bash
-    - name: 💧 Deploy to VPS...
+    - name: 💧 deploy to vps...
       run: |
-        cd ..
-        IN="${{ inputs.REPO }}"
-        set -- "$IN"
-        scp -r "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
-      shell: bash
+       cd ..
+       IN="${{ inputs.REPO }}"
+       set -- "$IN" 
+       IFS="/"; declare -a Array=($*) 
+       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
+      shell: bash 
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
       run: ssh ssh "${{ inputs.RUN }}"
