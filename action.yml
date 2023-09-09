@@ -12,8 +12,8 @@ inputs:
   USER:
     description: "An agent, which can be a human or software agent, using a computer or network service."
     required: true
-  PASSWORLD: 
-    description: ""
+  PASSWORD: 
+    description: "Password to use if SSH key is not provided."
     required: false
   KEY:
     description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
@@ -28,7 +28,6 @@ inputs:
     description: "Commands to be executed after the deploy (optional)."
     required: false
 
-
 runs:
   using: "composite"
   steps:
@@ -38,21 +37,10 @@ runs:
         if [[ -n "${{ inputs.KEY }}" ]]; then
           echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
           chmod 600 ~/.ssh/ssh.key
-        fi
-        if [[ -n "${{ inputs.PASSWORLD }}" ]]; then
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
           echo "PasswordAuthentication yes" > ~/.ssh/config
+          echo "${{ inputs.PASSWORD }}" > ~/.ssh/password.txt
         fi
-      shell: bash
-    - name: 🍷 Setting the ssh Key...
-      run: |
-        cat >>~/.ssh/config <<END
-        Host ssh
-          HostName ${{ inputs.IP }}
-          User ${{ inputs.USER }}
-          Port 22
-          IdentityFile ~/.ssh/ssh.key
-          StrictHostKeyChecking no
-        END
       shell: bash
     - name: ✨ Removing old files...
       run: |
@@ -68,5 +56,10 @@ runs:
       shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
-      run: ssh ssh "${{ inputs.RUN }}"
+      run: |
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          ssh ssh "${{ inputs.RUN }}"
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          sshpass -p "$(cat ~/.ssh/password.txt)" ssh ${{ inputs.USER }}@${{ inputs.IP }} "${{ inputs.RUN }}"
+        fi
       shell: bash
