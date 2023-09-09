@@ -39,7 +39,7 @@ runs:
           echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
           chmod 600 ~/.ssh/ssh.key
         fi
-        if [[ -n "${{ inputs.PASSWORD }}" ]]; then
+        if [[ -n "${{ inputs.PASSWORLD }}" ]]; then
           echo "PasswordAuthentication yes" > ~/.ssh/config
         fi
       shell: bash
