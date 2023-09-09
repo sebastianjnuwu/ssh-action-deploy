@@ -1,32 +1,32 @@
 name: ssh-action-deploy
-description: 'Deploy has never been so easy, running commands has never been simpler...'
-author: 'sebastianjnuwu'
+description: "Deploy has never been so easy, running commands has never been simpler..."
+author: "sebastianjnuwu"
 branding:
-  icon: 'terminal'
-  color: 'purple'
+  icon: "terminal"
+  color: "purple"
 
 inputs:
   IP:
-    description: 'The IP address is a unique identifier that identifies a device on the Internet or on a local network.'
+    description: "The IP address is a unique identifier that identifies a device on the Internet or on a local network."
     required: true
   USER:
-    description: 'A user is an agent, either a human agent or a software agent, who uses a computer or network service.'
+    description: "A user is an agent, either a human agent or a software agent, who uses a computer or network service."
     required: true
   KEY:
-    description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques.'
+    description: "ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques."
     required: true
   REPO:
-    description: 'Specify the name of the repository where the action is located.'
+    description: "Specify the name of the repository where the action is located."
     default: ${{ github.repository }}
   FOLDER:
     description: 'Name of the folder where the files are located, including the user (e.g., "user/deploy").'
     required: true
-  RUN: 
-    description: 'Specify the commands to be executed after the deploy.'
-    required: false  
+  RUN:
+    description: "Specify the commands to be executed after the deploy."
+    required: false
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: 🗿 Creating ssh files...
       run: |
@@ -47,7 +47,7 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-        ssh ssh cd "${{ inputs.FOLDER }}"; rm -rf *
+        ssh ssh rm -rf "${{ inputs.FOLDER }}"; 
       shell: bash
     - name: 💧 Deploy to VPS...
       run: |
