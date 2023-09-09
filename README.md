@@ -63,7 +63,7 @@ jobs:
 | -------- | ----------- | ------- |
 | `IP` | `1.1.1.1`| `true` |
 | `USER` | `root` | `true` |
-| `KEY` | xxxxxx | `true` |
-| `FOLDER` | `/user/.deploy`| `true` |
+| `KEY` | `xxxxxx` | `true` |
+| `FOLDER` | `/root/.deploy`| `true` |
 | `IGNORE` | `['img.jpg']` | `false` |
 | `RUN` | `uptime` | `false` |
