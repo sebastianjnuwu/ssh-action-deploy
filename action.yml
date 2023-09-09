@@ -12,11 +12,11 @@ inputs:
   USER:
     description: "An agent, which can be a human or software agent, using a computer or network service."
     required: true
-  KEY:
-    description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
-    required: false
   PASSWORD: 
     description: "Password to use for SSH authentication. If provided, it will be used instead of the key."
+    required: false
+  KEY:
+    description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
     required: false
   REPO:
     description: "The name of the repository where the action is located (default: the GitHub repository)."
@@ -38,7 +38,6 @@ runs:
           echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
           chmod 600 ~/.ssh/ssh.key
         elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
-          echo "PasswordAuthentication yes" > ~/.ssh/config
           echo "${{ inputs.PASSWORD }}" > ~/.ssh/password.txt
         fi
       shell: bash
