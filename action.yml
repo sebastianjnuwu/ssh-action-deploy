@@ -1,0 +1,80 @@
+name: ssh-action-deploy
+description: "Deploy has never been so easy, running commands has never been simpler..."
+author: "sebastianjnuwu"
+branding:
+  icon: "terminal"
+  color: "purple"
+
+inputs:
+  IP:
+    description: "A unique identifier for a device on the Internet or a local network."
+    required: true
+  USER:
+    description: "An agent, which can be a human or software agent, using a computer or network service."
+    required: true
+  KEY:
+    description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
+    required: false
+  PASSWORD: 
+    description: "Password to use for SSH authentication. If provided, it will be used instead of the key."
+    required: false
+  REPO:
+    description: "The name of the repository where the action is located (default: the GitHub repository)."
+    default: ${{ github.repository }}
+  FOLDER:
+    description: 'The name of the folder where files are located, including the user (e.g., "/user/deploy").'
+    required: true
+  RUN:
+    description: "Commands to be executed after the deploy (optional)."
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🗿 Creating ssh files...
+      run: |
+        mkdir -p ~/.ssh/
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
+          chmod 600 ~/.ssh/ssh.key
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          echo "PasswordAuthentication yes" > ~/.ssh/config
+          echo "${{ inputs.PASSWORD }}" > ~/.ssh/password.txt
+        fi
+      shell: bash
+    - name: ✨ Removing old files...
+      run: |
+        ssh_options=""
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          ssh_options="-i ~/.ssh/ssh.key"
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          ssh_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
+        fi
+        ssh $ssh_options ${{ inputs.USER }}@${{ inputs.IP }} "rm -rf ${{
+          inputs.FOLDER }}"
+      shell: bash
+    - name: 💧 deploy to vps...
+      run: |
+        cd ..
+        IN="${{ inputs.REPO }}"
+        set -- "$IN" 
+        IFS="/"; declare -a Array=($*) 
+        scp_options=""
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          scp_options="-i ~/.ssh/ssh.key"
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          scp_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
+        fi
+        scp -r $scp_options ${Array[1]} ${{ inputs.USER }}@${{ inputs.IP }}:${{ inputs.FOLDER }}
+      shell: bash
+    - name: 🍷 Executing commands...
+      if: ${{ inputs.RUN }}
+      run: |
+        ssh_options=""
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+          ssh_options="-i ~/.ssh/ssh.key"
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+          ssh_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
+        fi
+        ssh $ssh_options ${{ inputs.USER }}@${{ inputs.IP }} "${{ inputs.RUN }}"
+      shell: bash
