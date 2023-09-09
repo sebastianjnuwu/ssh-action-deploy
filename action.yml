@@ -59,22 +59,13 @@ runs:
         IN="${{ inputs.REPO }}"
         set -- "$IN"
         IFS="/"; declare -a Array=($*)
-        folder="${{ inputs.FOLDER#\/ }}"
-        folder="${{ folder%\/ }}"
-        user="${{ inputs.USER#\/ }}"
-        user="${{ user%\/ }}"
-        if [[ "${folder}" == /* ]]; then
-          fullFolder="${user}/${folder#\/}"
-        else
-          fullFolder="${user}/${folder}"
-        fi
         if [ "${{ inputs.IGNORE }}" != "[]" ]; then
           IFS=',' read -ra ignoreArray <<< "${{ inputs.IGNORE }}"
           for item in "${ignoreArray[@]}"; do
             scp -r -o "StrictHostKeyChecking=no" --exclude="$item" "${Array[1]}" ssh:"/${fullFolder}"
           done
         else
-          scp -r -o "StrictHostKeyChecking=no" "${Array[1]}" ssh:"/${fullFolder}"
+        scp -r -o "StrictHostKeyChecking=no" "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
         fi
       shell: bash
     - name: 🍷 Executing commands...
