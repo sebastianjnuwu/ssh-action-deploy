@@ -51,7 +51,7 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-        ssh ssh rm -rf "${{ inputs.FOLDER }}"
+        ssh ssh cd "${{ inputs.FOLDER }}"; rm -rf *
       shell: bash
     - name: 💧 Deploy to VPS...
       run: |
