@@ -1,0 +1,83 @@
+name: ssh-action-deploy
+description: 'Effortless deployment and post-deployment commands.'
+author: 'sebastianjnuwu'
+branding:
+  icon: 'terminal'
+  color: 'purple'
+
+inputs:
+  IP:
+    description: 'The IP address uniquely identifies a device on the Internet or a local network.'
+    required: true
+  USER:
+    description: 'A user, either human or software, that accesses a computer or network service.'
+    required: true
+  KEY:
+    description: 'ssh-keygen is a component for secure shell sessions between remote computers over networks.'
+    required: true
+  REPO:
+    description: 'Specify the repository name where the action is located.'
+    default: ${{ github.repository }}
+  FOLDER:
+    description: 'Folder name for the files, including the user (e.g., "user/deploy").'
+    required: true
+  IGNORE:
+    description: 'List of files or folders to exclude during deployment.'
+    required: false
+    default: '[]' 
+  RUN: 
+    description: 'Commands to run after deployment.'
+    required: false  
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🗿 Creating SSH files...
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
+        chmod 600 ~/.ssh/ssh.key
+      shell: bash
+    - name: 🍷 Setting the SSH Key...
+      run: |
+        cat >>~/.ssh/config <<END
+        Host ssh
+          HostName ${{ inputs.IP }}
+          User ${{ inputs.USER }}
+          Port 22
+          IdentityFile ~/.ssh/ssh.key
+          StrictHostKeyChecking no
+        END
+      shell: bash
+    - name: ✨ Removing old files...
+      run: |
+        ssh ssh cd "${{ inputs.FOLDER }}"; rm -rf *
+      shell: bash
+    - name: 💧 Deploying to VPS...
+      run: |
+        cd ..
+        IN="${{ inputs.REPO }}"
+        set -- "$IN"
+        IFS="/"; declare -a Array=($*)
+        folder="${{ inputs.FOLDER#\/ }}"
+        folder="${{ folder%\/ }}"
+        user="${{ inputs.USER#\/ }}"
+        user="${{ user%\/ }}"
+        if [[ "${folder}" == /* ]]; then
+          fullFolder="${user}/${folder#\/}"
+        else
+          fullFolder="${user}/${folder}"
+        fi
+        if [ "${{ inputs.IGNORE }}" != "[]" ]; then
+          IFS=',' read -ra ignoreArray <<< "${{ inputs.IGNORE }}"
+          for item in "${ignoreArray[@]}"; do
+            scp -r -o "StrictHostKeyChecking=no" --exclude="$item" "${Array[1]}" ssh:"/${fullFolder}"
+          done
+        else
+          scp -r -o "StrictHostKeyChecking=no" "${Array[1]}" ssh:"/${fullFolder}"
+        fi
+      shell: bash
+    - name: 🍷 Executing commands...
+      if: ${{ inputs.RUN }}
+      run: ssh ssh "${{ inputs.RUN }}"
+      shell: bash
