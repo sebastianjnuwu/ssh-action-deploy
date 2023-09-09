@@ -14,5 +14,5 @@ jobs:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
-          FOLDER: 'root/.deploy'
+          FOLDER: '/.deploy'
           RUN: 'ls -a; pwd'
