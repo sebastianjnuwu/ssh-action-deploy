@@ -24,7 +24,7 @@ inputs:
   IGNORE:
     description: 'List of files or folders to be excluded during deployment.'
     required: false
-    default: '' 
+    default: '[]' 
   RUN: 
     description: 'Specify the commands to be executed after the deploy.'
     required: false  
@@ -59,12 +59,13 @@ runs:
         IN="${{ inputs.REPO }}"
         set -- "$IN"
         IFS="/"; declare -a Array=($*)
-        if [ -n "${inputs.IGNORE}" ]; then
-          for item in ${inputs.IGNORE//,/ }; do
-            rsync -av --exclude="$item" "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
-          done
+        if [ "${{ inputs.IGNORE }}" != "[]" ]; then
+        IFS=',' read -ra ignoreArray <<< "${{ inputs.IGNORE }}"
+        for item in "${ignoreArray[@]}"; do
+        rsync -av --exclude="$item" "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
+        done
         else
-          scp -r "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
+        scp -r "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
         fi
       shell: bash
     - name: 🍷 Executing commands...
