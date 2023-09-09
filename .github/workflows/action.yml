@@ -13,6 +13,7 @@ jobs:
         with:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
-          KEY: ${{ secrets.KEY }}
+          PASSWORLD: ${{ secrets.PASSWORLD }}
+         # KEY: ${{ secrets.KEY }}
           FOLDER: "/root/.deploy"
           RUN: "ls -a; pwd; uptime"
