@@ -52,7 +52,6 @@ jobs:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
-          IGNORE: "['README.md','LICENSE']"
           FOLDER: "/root/.deploy"
           RUN: "ls -a; pwd"
   ```
@@ -65,5 +64,4 @@ jobs:
 | `USER` | `root` | `true` |
 | `KEY` | `xxxxxx` | `true` |
 | `FOLDER` | `/root/.deploy`| `true` |
-| `IGNORE` | `['img.jpg']` | `false` |
 | `RUN` | `uptime` | `false` |
