@@ -59,14 +59,27 @@ runs:
         IN="${{ inputs.REPO }}"
         set -- "$IN"
         IFS="/"; declare -a Array=($*)
+        folder="${{ inputs.FOLDER#\/ }}"
+        folder="${{ folder%\/ }}"
+        user="${{ inputs.USER#\/ }}"
+        user="${{ user%\/ }}"
+        if [[ "${folder}" == /* ]]; then
+          fullFolder="${user}/${folder#\/}"
+        else
+          fullFolder="${user}/${folder}"
+        fi
+        # Crie um arquivo de exclusão temporário
+        exclude_file=$(mktemp)
         if [ "${{ inputs.IGNORE }}" != "[]" ]; then
           IFS=',' read -ra ignoreArray <<< "${{ inputs.IGNORE }}"
           for item in "${ignoreArray[@]}"; do
-            scp -r -o "StrictHostKeyChecking=no" --exclude="$item" "${Array[1]}" ssh:"/${fullFolder}"
+            echo "${item}" >> "${exclude_file}"
           done
-        else
-        scp -r -o "StrictHostKeyChecking=no" "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
         fi
+        # Use o arquivo de exclusão temporário para evitar a cópia de arquivos excluídos
+        scp -r -o "StrictHostKeyChecking=no" -v -T --exclude-from="${exclude_file}" "${Array[1]}" ssh:"/${fullFolder}"
+        # Remova o arquivo de exclusão temporário
+        rm "${exclude_file}"
       shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
