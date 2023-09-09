@@ -49,11 +49,11 @@ runs:
           StrictHostKeyChecking no
         END
       shell: bash
-    - name: Install rsync
+    - name: 🧠 Install rsync
       run: |
        sudo apt-get update
        sudo apt-get install -y rsync
-      bash: shell
+      shell: bash
     - name: ✨ Removing old files...
       run: |
         ssh ssh cd "${{ inputs.FOLDER }}"; rm -rf *
