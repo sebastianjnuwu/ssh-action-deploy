@@ -1,29 +1,33 @@
 name: ssh-action-deploy
-description: 'Deploy has never been so easy running commands even less...'
+description: 'Make your deploy process even simpler by running commands with ease...'
 author: 'sebastianjnuwu'
+
 branding:
   icon: 'terminal'
   color: 'purple'
 
 inputs:
   IP:
-    description: 'IP address is a unique address that identifies a device on the Internet or on a local network.'
+    description: 'The IP address is a unique identifier that identifies a device on the Internet or on a local network.'
     required: true
   USER:
-    description: 'A user or user is an agent, either a human agent or a software agent, who uses a computer or network service.'
+    description: 'A user is an agent, either a human agent or a software agent, who uses a computer or network service.'
     required: true
   KEY:
-    description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques. '
+    description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques.'
     required: true
   REPO:
-    description: 'Put the name of the repository where the action is.'
+    description: 'Specify the name of the repository where the action is located.'
     default: ${{ github.repository }}
   FOLDER:
     description: 'Name of the folder where the files are located.'
     required: true
-  RUN: 
-    description: 'Put the commands that will be executed after the deploy.'
-    required: false  # Set to false to make the input optional.
+  IGNORE:
+    description: 'List files or folders to be excluded during deployment.'
+    required: false
+  RUN:
+    description: 'Specify the commands to be executed after the deploy.'
+    required: false
 
 runs:
   using: 'composite'
@@ -47,18 +51,20 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-       ssh ssh rm -rf /${{ inputs.FOLDER }}
-      shell: bash 
-    - name: 💧 deploy to vps...
+        ssh ssh rm -rf /${{ inputs.FOLDER }}
+      shell: bash
+    - name: 💧 Deploy to VPS...
       run: |
-       cd ..
-       IN="${{ inputs.REPO }}"
-       set -- "$IN" 
-       IFS="/"; declare -a Array=($*) 
-       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
-      shell: bash 
+        cd ..
+        IN="${{ inputs.REPO }}"
+        set -- "$IN"
+        IFS="/"; declare -a Array=($*)
+        for item in "${IGNORE[@]}"; do
+          rsync -av --exclude="$item" ${Array[1]} ssh:/${{ inputs.FOLDER }}
+        done
+      shell: bash
     - name: 🍷 Executing commands...
-      if: ${{ inputs.RUN }}  # Add this condition to run the step only if RUN is provided.
+      if: ${{ inputs.RUN }}
       run: ssh ssh "${{ inputs.RUN }}"
       shell: bash
       
