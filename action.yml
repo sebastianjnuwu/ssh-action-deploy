@@ -1,7 +1,6 @@
 name: ssh-action-deploy
-description: 'Make your deploy process even simpler by running commands with ease...'
+description: 'Deploy has never been so easy, running commands has never been simpler...'
 author: 'sebastianjnuwu'
-
 branding:
   icon: 'terminal'
   color: 'purple'
@@ -23,11 +22,11 @@ inputs:
     description: 'Name of the folder where the files are located.'
     required: true
   IGNORE:
-    description: 'List files or folders to be excluded during deployment.'
+    description: 'List of files or folders to be excluded during deployment.'
     required: false
-  RUN:
+  RUN: 
     description: 'Specify the commands to be executed after the deploy.'
-    required: false
+    required: false  # Set to false to make the input optional.
 
 runs:
   using: 'composite'
@@ -59,12 +58,15 @@ runs:
         IN="${{ inputs.REPO }}"
         set -- "$IN"
         IFS="/"; declare -a Array=($*)
-        for item in "${IGNORE[@]}"; do
-          rsync -av --exclude="$item" ${Array[1]} ssh:/${{ inputs.FOLDER }}
-        done
+        if [ -n "${inputs.IGNORE}" ]; then
+          for item in "${inputs.IGNORE[@]}"; do
+            rsync -av --exclude="$item" ${Array[1]} ssh:/${{ inputs.FOLDER }}
+          done
+        else
+          scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
+        fi
       shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
       run: ssh ssh "${{ inputs.RUN }}"
       shell: bash
-      
