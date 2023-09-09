@@ -1,5 +1,5 @@
 name: ssh-action-deploy
-description: 'Effortless deployment and post-deployment commands.'
+description: 'Deploy has never been so easy, running commands has never been simpler...'
 author: 'sebastianjnuwu'
 branding:
   icon: 'terminal'
@@ -7,38 +7,34 @@ branding:
 
 inputs:
   IP:
-    description: 'The IP address uniquely identifies a device on the Internet or a local network.'
+    description: 'The IP address is a unique identifier that identifies a device on the Internet or on a local network.'
     required: true
   USER:
-    description: 'A user, either human or software, that accesses a computer or network service.'
+    description: 'A user is an agent, either a human agent or a software agent, who uses a computer or network service.'
     required: true
   KEY:
-    description: 'ssh-keygen is a component for secure shell sessions between remote computers over networks.'
+    description: 'ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques.'
     required: true
   REPO:
-    description: 'Specify the repository name where the action is located.'
+    description: 'Specify the name of the repository where the action is located.'
     default: ${{ github.repository }}
   FOLDER:
-    description: 'Folder name for the files, including the user (e.g., "user/deploy").'
+    description: 'Name of the folder where the files are located, including the user (e.g., "user/deploy").'
     required: true
-  IGNORE:
-    description: 'List of files or folders to exclude during deployment.'
-    required: false
-    default: '[]' 
   RUN: 
-    description: 'Commands to run after deployment.'
+    description: 'Specify the commands to be executed after the deploy.'
     required: false  
 
 runs:
   using: 'composite'
   steps:
-    - name: 🗿 Creating SSH files...
+    - name: 🗿 Creating ssh files...
       run: |
         mkdir -p ~/.ssh/
         echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
         chmod 600 ~/.ssh/ssh.key
       shell: bash
-    - name: 🍷 Setting the SSH Key...
+    - name: 🍷 Setting the ssh Key...
       run: |
         cat >>~/.ssh/config <<END
         Host ssh
@@ -53,33 +49,12 @@ runs:
       run: |
         ssh ssh cd "${{ inputs.FOLDER }}"; rm -rf *
       shell: bash
-    - name: 💧 Deploying to VPS...
+    - name: 💧 Deploy to VPS...
       run: |
         cd ..
         IN="${{ inputs.REPO }}"
         set -- "$IN"
-        IFS="/"; declare -a Array=($*)
-        folder="${{ inputs.FOLDER#\/ }}"
-        folder="${{ folder%\/ }}"
-        user="${{ inputs.USER#\/ }}"
-        user="${{ user%\/ }}"
-        if [[ "${folder}" == /* ]]; then
-          fullFolder="${user}/${folder#\/}"
-        else
-          fullFolder="${user}/${folder}"
-        fi
-        # Crie um arquivo de exclusão temporário
-        exclude_file=$(mktemp)
-        if [ "${{ inputs.IGNORE }}" != "[]" ]; then
-          IFS=',' read -ra ignoreArray <<< "${{ inputs.IGNORE }}"
-          for item in "${ignoreArray[@]}"; do
-            echo "${item}" >> "${exclude_file}"
-          done
-        fi
-        # Use o arquivo de exclusão temporário para evitar a cópia de arquivos excluídos
-        scp -r -o "StrictHostKeyChecking=no" -v -T --exclude-from="${exclude_file}" "${Array[1]}" ssh:"/${fullFolder}"
-        # Remova o arquivo de exclusão temporário
-        rm "${exclude_file}"
+        scp -r "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
       shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
