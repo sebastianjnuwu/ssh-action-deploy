@@ -19,14 +19,15 @@ inputs:
     description: 'Specify the name of the repository where the action is located.'
     default: ${{ github.repository }}
   FOLDER:
-    description: 'Name of the folder where the files are located.'
+    description: 'Name of the folder where the files are located, including the user (e.g., "user/deploy").'
     required: true
   IGNORE:
     description: 'List of files or folders to be excluded during deployment.'
     required: false
+    default: '' 
   RUN: 
     description: 'Specify the commands to be executed after the deploy.'
-    required: false  # Set to false to make the input optional.
+    required: false  
 
 runs:
   using: 'composite'
@@ -50,7 +51,7 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-        ssh ssh rm -rf /${{ inputs.FOLDER }}
+        ssh ssh rm -rf "${{ inputs.FOLDER }}"
       shell: bash
     - name: 💧 Deploy to VPS...
       run: |
@@ -59,11 +60,11 @@ runs:
         set -- "$IN"
         IFS="/"; declare -a Array=($*)
         if [ -n "${inputs.IGNORE}" ]; then
-          for item in "${inputs.IGNORE[@]}"; do
-            rsync -av --exclude="$item" ${Array[1]} ssh:/${{ inputs.FOLDER }}
+          for item in ${inputs.IGNORE//,/ }; do
+            rsync -av --exclude="$item" "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
           done
         else
-          scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
+          scp -r "${Array[1]}" ssh:"${{ inputs.FOLDER }}"
         fi
       shell: bash
     - name: 🍷 Executing commands...
