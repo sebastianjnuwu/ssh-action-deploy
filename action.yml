@@ -7,25 +7,22 @@ branding:
 
 inputs:
   IP:
-    description: "A unique identifier for a device on the Internet or a local network."
+    description: "The IP address is a unique identifier that identifies a device on the Internet or on a local network."
     required: true
   USER:
-    description: "An agent, which can be a human or software agent, using a computer or network service."
+    description: "A user is an agent, either a human agent or a software agent, who uses a computer or network service."
     required: true
-  PASSWORD: 
-    description: "Password to use for SSH authentication. If provided, it will be used instead of the key."
-    required: false
   KEY:
-    description: "A component of the Secure Shell protocol suite used to establish secure shell sessions between remote computers over insecure networks, using cryptographic techniques."
-    required: false
+    description: "ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques."
+    required: true
   REPO:
-    description: "The name of the repository where the action is located (default: the GitHub repository)."
+    description: "Specify the name of the repository where the action is located."
     default: ${{ github.repository }}
   FOLDER:
-    description: 'The name of the folder where files are located, including the user (e.g., "/user/deploy").'
+    description: 'Name of the folder where the files are located, including the user (e.g., "user/deploy").'
     required: true
   RUN:
-    description: "Commands to be executed after the deploy (optional)."
+    description: "Specify the commands to be executed after the deploy."
     required: false
 
 runs:
@@ -34,46 +31,33 @@ runs:
     - name: 🗿 Creating ssh files...
       run: |
         mkdir -p ~/.ssh/
-        if [[ -n "${{ inputs.KEY }}" ]]; then
-          echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
-          chmod 600 ~/.ssh/ssh.key
-        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
-          echo "${{ inputs.PASSWORD }}" > ~/.ssh/password.txt
-        fi
+        echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
+        chmod 600 ~/.ssh/ssh.key
+      shell: bash
+    - name: 🍷 Setting the ssh Key...
+      run: |
+        cat >>~/.ssh/config <<END
+        Host ssh
+          HostName ${{ inputs.IP }}
+          User ${{ inputs.USER }}
+          Port 22
+          IdentityFile ~/.ssh/ssh.key
+          StrictHostKeyChecking no
+        END
       shell: bash
     - name: ✨ Removing old files...
       run: |
-        ssh_options=""
-        if [[ -n "${{ inputs.KEY }}" ]]; then
-          ssh_options="-i ~/.ssh/ssh.key"
-        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
-          ssh_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
-        fi
-        ssh $ssh_options ${{ inputs.USER }}@${{ inputs.IP }} "rm -rf ${{
-          inputs.FOLDER }}"
+        ssh ssh rm -rf "${{ inputs.FOLDER }}"; 
       shell: bash
     - name: 💧 deploy to vps...
       run: |
-        cd ..
-        IN="${{ inputs.REPO }}"
-        set -- "$IN" 
-        IFS="/"; declare -a Array=($*) 
-        scp_options=""
-        if [[ -n "${{ inputs.KEY }}" ]]; then
-          scp_options="-i ~/.ssh/ssh.key"
-        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
-          scp_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
-        fi
-        scp -r $scp_options ${Array[1]} ${{ inputs.USER }}@${{ inputs.IP }}:${{ inputs.FOLDER }}
-      shell: bash
+       cd ..
+       IN="${{ inputs.REPO }}"
+       set -- "$IN" 
+       IFS="/"; declare -a Array=($*) 
+       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
+      shell: bash 
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
-      run: |
-        ssh_options=""
-        if [[ -n "${{ inputs.KEY }}" ]]; then
-          ssh_options="-i ~/.ssh/ssh.key"
-        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
-          ssh_options="-o PasswordAuthentication=yes -o PubkeyAuthentication=no -i ~/.ssh/password.txt"
-        fi
-        ssh $ssh_options ${{ inputs.USER }}@${{ inputs.IP }} "${{ inputs.RUN }}"
+      run: ssh ssh "${{ inputs.RUN }}"
       shell: bash
