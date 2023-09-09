@@ -52,9 +52,9 @@ jobs:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
           KEY: ${{ secrets.KEY }}
-          IGNORE: ['README.md','LICENSE']
-          FOLDER: '/root/.deploy'
-          RUN: 'ls -a; pwd'
+          IGNORE: "['README.md','LICENSE']"
+          FOLDER: "/root/.deploy"
+          RUN: "ls -a; pwd"
   ```
   
 ## variables 
