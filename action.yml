@@ -12,7 +12,7 @@ inputs:
   USER:
     description: "An agent, which can be a human or software agent, using a computer or network service."
     required: true
-  PASSWORD: 
+  PASSWORD:
     description: "Password to use if SSH key is not provided."
     required: false
   KEY:
@@ -44,7 +44,11 @@ runs:
       shell: bash
     - name: ✨ Removing old files...
       run: |
-        ssh ssh rm -rf "${{ inputs.FOLDER }}";
+        if [[ -n "${{ inputs.KEY }}" ]]; then
+         ssh ssh rm -rf "${{ inputs.FOLDER }}";
+        elif [[ -n "${{ inputs.PASSWORD }}" ]]; then
+         sshpass -p "$(cat ~/.ssh/password.txt)" ssh ${{ inputs.USER }}@${{ inputs.IP }} rm -rf "${{ inputs.FOLDER }}";
+        fi
       shell: bash
     - name: 💧 deploy to vps...
       run: |
