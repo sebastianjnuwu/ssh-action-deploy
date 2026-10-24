@@ -1,6 +1,5 @@
+
 <p align="center">
-  <img src="https://icon-library.com/images/terminal-icon/terminal-icon-1.jpg" width=140 height=140 />
-  <br>
   <b>ssh-action-deploy</b>
   <br>
   <smail>"What you were looking for all this time to be here, deploy your application"</smail>
@@ -12,6 +11,7 @@
   - Deploy your application 
   - Execute commands
   - Easy and fast 
+  - Authenticate with an ssh **key** or with a **password**
 
 # mode of use
 
@@ -25,6 +25,10 @@
  • We use the default ssh port (22) to execute the deploy
 
  • If you want to use several commands, separate them with `&` or `;`.
+
+ • You must provide **one** authentication method: `KEY` (private key) or `PASSWORD`. If both are provided, `KEY` is used first and `PASSWORD` as fallback.
+
+ • The password mode uses [sshpass](https://sourceforge.net/projects/sshpass/), which is installed automatically on the runner (`apt`, `apk`, `dnf`, `yum` or `brew`).
 
 ## example
 
@@ -55,13 +59,31 @@ jobs:
           FOLDER: "/root/.deploy"
           RUN: "ls -a; pwd"
   ```
-  
+
+## example with password
+
+  Only the authentication changes: drop `KEY` and use `PASSWORD`.
+
+```yml
+      - name: 🌈 Deploy with ssh password...
+        uses: sebastianjnuwu/ssh-action-deploy@v4
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          FOLDER: "/root/.deploy"
+          RUN: "ls -a; pwd"
+  ```
+
+  > The password is passed to `sshpass` through the `SSHPASS` environment variable (not on the command line), so it does not show up in the process list.
+
 ## variables 
 
 | variable | example  | require |
 | -------- | ----------- | ------- |
 | `IP` | `1.1.1.1`| `true` |
 | `USER` | `root` | `true` |
-| `KEY` | `xxxxxx` | `true` |
+| `KEY` | `xxxxxx` | `false` (required if `PASSWORD` is empty) |
+| `PASSWORD` | `xxxxxx` | `false` (required if `KEY` is empty) |
 | `FOLDER` | `/root/.deploy`| `true` |
 | `RUN` | `uptime` | `false` |
