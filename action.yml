@@ -113,9 +113,11 @@ runs:
         SSH_FOLDER: ${{ inputs.FOLDER }}
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-        SSH="ssh"
-        if [ -n "$SSHPASS" ]; then SSH="sshpass -e ssh"; fi
-        $SSH ssh rm -rf "$SSH_FOLDER"
+        if [ -n "$SSHPASS" ]; then
+          sshpass -e ssh ssh rm -rf "$SSH_FOLDER"
+        else
+          ssh ssh rm -rf "$SSH_FOLDER"
+        fi
       shell: bash
     - name: 💧 deploy to vps...
       if: inputs.COMPATABILITY != 'true'
@@ -125,12 +127,13 @@ runs:
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
         cd ..
-        IN="$SSH_REPO"
-        set -- "$IN"
-        IFS="/"; declare -a Array=($*)
-        SCP="scp"
-        if [ -n "$SSHPASS" ]; then SCP="sshpass -e scp"; fi
-        $SCP -r ${Array[1]} ssh:/$SSH_FOLDER
+        REPO_NAME="${SSH_REPO##*/}"
+        echo "enviando: $REPO_NAME -> ssh:$SSH_FOLDER"
+        if [ -n "$SSHPASS" ]; then
+          sshpass -e scp -r "$REPO_NAME" "ssh:$SSH_FOLDER"
+        else
+          scp -r "$REPO_NAME" "ssh:$SSH_FOLDER"
+        fi
       shell: bash
     - name: 💧 deploy to vps with compatability...
       if: inputs.COMPATABILITY == 'true'
@@ -140,12 +143,13 @@ runs:
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
         cd ..
-        IN="$SSH_REPO"
-        set -- "$IN"
-        IFS="/"; declare -a Array=($*)
-        SCP="scp"
-        if [ -n "$SSHPASS" ]; then SCP="sshpass -e scp"; fi
-        $SCP -O -r ${Array[1]} ssh:/$SSH_FOLDER
+        REPO_NAME="${SSH_REPO##*/}"
+        echo "enviando: $REPO_NAME -> ssh:$SSH_FOLDER"
+        if [ -n "$SSHPASS" ]; then
+          sshpass -e scp -O -r "$REPO_NAME" "ssh:$SSH_FOLDER"
+        else
+          scp -O -r "$REPO_NAME" "ssh:$SSH_FOLDER"
+        fi
       shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
@@ -153,7 +157,9 @@ runs:
         SSH_RUN: ${{ inputs.RUN }}
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-        SSH="ssh"
-        if [ -n "$SSHPASS" ]; then SSH="sshpass -e ssh"; fi
-        $SSH ssh "$SSH_RUN"
+        if [ -n "$SSHPASS" ]; then
+          sshpass -e ssh ssh "$SSH_RUN"
+        else
+          ssh ssh "$SSH_RUN"
+        fi
       shell: bash
