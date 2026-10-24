@@ -1,18 +1,37 @@
-name: 🐥 ssh-action-deploy
-on: [push]
+name: 🧪 test ssh-action-deploy
+
+on:
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
 
 jobs:
-  build:
-    name: 🕳️ Ubuntu...
+  password:
+    name: 🔑 modo senha
     runs-on: ubuntu-latest
     steps:
-      - name: 💞 Github actions...
+      - name: 💞 checkout
         uses: actions/checkout@v3
-      - name: 🌈 Deploy with ssh...
+      - name: 🌈 deploy com senha
         uses: ./
         with:
-          IP: ${{ secrets.IP }}
-          USER: ${{ secrets.USER }}
-          KEY: ${{ secrets.KEY }}
-          FOLDER: 'root/.deploy'
-          RUN: 'reboot'
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          FOLDER: "/tmp/action-test-pass"
+          RUN: "echo PASSWORD-OK; whoami; hostname; pwd"
+
+  key:
+    name: 🗝️ modo chave
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 deploy com chave
+        uses: ./
+        with:
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          KEY: ${{ secrets.KEY_TEST }}
+          FOLDER: "/tmp/action-test-key"
+          RUN: "echo KEY-OK; whoami; hostname; pwd"

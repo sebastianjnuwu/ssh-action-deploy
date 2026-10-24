@@ -13,8 +13,11 @@ inputs:
     description: "A user is an agent, either a human agent or a software agent, who uses a computer or network service."
     required: true
   KEY:
-    description: "ssh-keygen is a standard component of the Secure Shell protocol suite found on Unix, Unix-like, and Microsoft Windows computer systems used to establish secure shell sessions between remote computers over insecure networks, through the use of various cryptographic techniques."
-    required: true
+    description: "Private ssh key used to authenticate (the content of the key). Required only if PASSWORD is not provided."
+    required: false
+  PASSWORD:
+    description: "SSH password used to authenticate. Required only if KEY is not provided. sshpass is installed automatically on the runner."
+    required: false
   REPO:
     description: "Specify the name of the repository where the action is located."
     default: ${{ github.repository }}
@@ -27,52 +30,130 @@ inputs:
   COMPATABILITY:
     description: "Add the '-O' compatability flag to the SCP command for targets with older verions of OPENSSH (ie: Ubuntu 14.X)."
     required: false
-    type: boolean
+    default: "false"
 
 runs:
   using: "composite"
   steps:
+    - name: 🔐 Validating the credentials...
+      env:
+        SSH_KEY: ${{ inputs.KEY }}
+        SSH_PASSWORD: ${{ inputs.PASSWORD }}
+      run: |
+        if [ -z "$SSH_KEY" ] && [ -z "$SSH_PASSWORD" ]; then
+          echo "::error::You must provide at least one authentication method: 'KEY' (private key) or 'PASSWORD' (ssh password)."
+          exit 1
+        fi
+      shell: bash
+    - name: 📦 Installing sshpass (password mode)...
+      if: inputs.PASSWORD != ''
+      run: |
+        if command -v sshpass >/dev/null 2>&1; then
+          echo "sshpass is already available."
+          exit 0
+        fi
+        SUDO=""
+        if [ "$(id -u)" -ne 0 ]; then
+          SUDO="sudo"
+        fi
+        if command -v apt-get >/dev/null 2>&1; then
+          $SUDO apt-get update -qq
+          $SUDO apt-get install -y -qq sshpass
+        elif command -v apk >/dev/null 2>&1; then
+          $SUDO apk add --no-cache sshpass
+        elif command -v dnf >/dev/null 2>&1; then
+          $SUDO dnf install -y sshpass
+        elif command -v yum >/dev/null 2>&1; then
+          $SUDO yum install -y sshpass
+        elif command -v brew >/dev/null 2>&1; then
+          brew install hudochenkov/sshpass/sshpass
+        else
+          echo "::error::Could not install sshpass, use 'KEY' instead or install sshpass manually."
+          exit 1
+        fi
+      shell: bash
     - name: 🗿 Creating ssh files...
+      if: inputs.KEY != ''
+      env:
+        SSH_KEY: ${{ inputs.KEY }}
       run: |
         mkdir -p ~/.ssh/
-        echo "${{ inputs.KEY }}" > ~/.ssh/ssh.key
+        printf '%s\n' "$SSH_KEY" > ~/.ssh/ssh.key
         chmod 600 ~/.ssh/ssh.key
       shell: bash
-    - name: 🍷 Setting the ssh Key...
+    - name: 🍷 Setting the ssh config...
+      env:
+        SSH_HOST: ${{ inputs.IP }}
+        SSH_USER: ${{ inputs.USER }}
+        SSH_KEY: ${{ inputs.KEY }}
+        SSH_PASSWORD: ${{ inputs.PASSWORD }}
       run: |
-        echo ${{ inputs.IP }}
-        cat >>~/.ssh/config <<END
-        Host ssh
-          HostName ${{ inputs.IP }}
-          User ${{ inputs.USER }}
-          Port 22
-          IdentityFile ~/.ssh/ssh.key
-          StrictHostKeyChecking no
-        END
+        echo "$SSH_HOST"
+        mkdir -p ~/.ssh/
+        {
+          echo "Host ssh"
+          echo "  HostName $SSH_HOST"
+          echo "  User $SSH_USER"
+          echo "  Port 22"
+          echo "  StrictHostKeyChecking no"
+          echo "  UserKnownHostsFile /dev/null"
+          if [ -n "$SSH_KEY" ]; then
+            echo "  IdentityFile ~/.ssh/ssh.key"
+            echo "  IdentitiesOnly yes"
+          fi
+          if [ -z "$SSH_KEY" ] && [ -n "$SSH_PASSWORD" ]; then
+            echo "  PreferredAuthentications password"
+            echo "  PubkeyAuthentication no"
+          fi
+        } >> ~/.ssh/config
+        chmod 600 ~/.ssh/config
       shell: bash
     - name: ✨ Removing old files...
+      env:
+        SSH_FOLDER: ${{ inputs.FOLDER }}
+        SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-        ssh ssh rm -rf "${{ inputs.FOLDER }}"; 
+        SSH="ssh"
+        if [ -n "$SSHPASS" ]; then SSH="sshpass -e ssh"; fi
+        $SSH ssh rm -rf "$SSH_FOLDER"
       shell: bash
     - name: 💧 deploy to vps...
-      if: inputs.COMPATABILITY == 'false'
+      if: inputs.COMPATABILITY != 'true'
+      env:
+        SSH_REPO: ${{ inputs.REPO }}
+        SSH_FOLDER: ${{ inputs.FOLDER }}
+        SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-       cd ..
-       IN="${{ inputs.REPO }}"
-       set -- "$IN" 
-       IFS="/"; declare -a Array=($*) 
-       scp -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
+        cd ..
+        IN="$SSH_REPO"
+        set -- "$IN"
+        IFS="/"; declare -a Array=($*)
+        SCP="scp"
+        if [ -n "$SSHPASS" ]; then SCP="sshpass -e scp"; fi
+        $SCP -r ${Array[1]} ssh:/$SSH_FOLDER
       shell: bash
     - name: 💧 deploy to vps with compatability...
       if: inputs.COMPATABILITY == 'true'
+      env:
+        SSH_REPO: ${{ inputs.REPO }}
+        SSH_FOLDER: ${{ inputs.FOLDER }}
+        SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-       cd ..
-       IN="${{ inputs.REPO }}"
-       set -- "$IN" 
-       IFS="/"; declare -a Array=($*) 
-       scp -O -r ${Array[1]} ssh:/${{ inputs.FOLDER }}
-      shell: bash       
+        cd ..
+        IN="$SSH_REPO"
+        set -- "$IN"
+        IFS="/"; declare -a Array=($*)
+        SCP="scp"
+        if [ -n "$SSHPASS" ]; then SCP="sshpass -e scp"; fi
+        $SCP -O -r ${Array[1]} ssh:/$SSH_FOLDER
+      shell: bash
     - name: 🍷 Executing commands...
       if: ${{ inputs.RUN }}
-      run: ssh ssh "${{ inputs.RUN }}"
+      env:
+        SSH_RUN: ${{ inputs.RUN }}
+        SSHPASS: ${{ inputs.PASSWORD }}
+      run: |
+        SSH="ssh"
+        if [ -n "$SSHPASS" ]; then SSH="sshpass -e ssh"; fi
+        $SSH ssh "$SSH_RUN"
       shell: bash
