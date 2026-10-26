@@ -13,9 +13,9 @@ jobs:
       - name: 🌈 deploy com senha
         uses: ./
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           FOLDER: "/tmp/action-test-pass"
           RUN: "echo PASSWORD-OK; whoami; hostname; pwd"
 
@@ -28,9 +28,9 @@ jobs:
       - name: 🌈 deploy com chave
         uses: ./
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          KEY: ${{ secrets.KEY_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
           FOLDER: "/tmp/action-test-key"
           RUN: "echo KEY-OK; whoami; hostname; pwd"
 
@@ -43,10 +43,10 @@ jobs:
       - name: 🌈 deploy com key e senha
         uses: ./
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          KEY: ${{ secrets.KEY_TEST }}
-          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           FOLDER: "/tmp/action-test-both"
           RUN: "echo KEY-AND-PASSWORD-OK; whoami"
 
@@ -59,10 +59,10 @@ jobs:
       - name: 🌈 deploy só com pasta
         uses: ./
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          KEY: ${{ secrets.KEY_TEST }}
-          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           FOLDER: "/tmp/action-test-folder-only"
 
   run_only:
@@ -74,10 +74,10 @@ jobs:
       - name: 🌈 executa só comandos
         uses: ./
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          KEY: ${{ secrets.KEY_TEST }}
-          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
           RUN: "echo RUN-ONLY-OK; uptime"
 
   neither:
@@ -91,9 +91,9 @@ jobs:
         uses: ./
         continue-on-error: true
         with:
-          IP: ${{ secrets.IP_TEST }}
-          USER: ${{ secrets.USER_TEST }}
-          KEY: ${{ secrets.KEY_TEST }}
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
       - name: 🧪 verifica que falhou
         run: |
           if [ "${{ steps.expect_fail.outcome }}" != "failure" ]; then
