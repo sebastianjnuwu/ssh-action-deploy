@@ -33,3 +33,71 @@ jobs:
           KEY: ${{ secrets.KEY_TEST }}
           FOLDER: "/tmp/action-test-key"
           RUN: "echo KEY-OK; whoami; hostname; pwd"
+
+  key_and_password:
+    name: 🗝️🔑 key + senha juntas
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 deploy com key e senha
+        uses: ./
+        with:
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          KEY: ${{ secrets.KEY_TEST }}
+          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          FOLDER: "/tmp/action-test-both"
+          RUN: "echo KEY-AND-PASSWORD-OK; whoami"
+
+  folder_only:
+    name: 📁 só pasta (sem cmd)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 deploy só com pasta
+        uses: ./
+        with:
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          KEY: ${{ secrets.KEY_TEST }}
+          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          FOLDER: "/tmp/action-test-folder-only"
+
+  run_only:
+    name: ⚡ só cmd (sem pasta)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 executa só comandos
+        uses: ./
+        with:
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          KEY: ${{ secrets.KEY_TEST }}
+          PASSWORD: ${{ secrets.PASSWORD_TEST }}
+          RUN: "echo RUN-ONLY-OK; uptime"
+
+  neither:
+    name: ❌ sem pasta e sem cmd (deve falhar)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 espera erro
+        id: expect_fail
+        uses: ./
+        continue-on-error: true
+        with:
+          IP: ${{ secrets.IP_TEST }}
+          USER: ${{ secrets.USER_TEST }}
+          KEY: ${{ secrets.KEY_TEST }}
+      - name: 🧪 verifica que falhou
+        run: |
+          if [ "${{ steps.expect_fail.outcome }}" != "failure" ]; then
+            echo "::error::Action should fail when FOLDER and RUN are both empty."
+            exit 1
+          fi
+          echo "OK: falhou como esperado."

@@ -13,10 +13,10 @@ inputs:
     description: "A user is an agent, either a human agent or a software agent, who uses a computer or network service."
     required: true
   KEY:
-    description: "Private ssh key used to authenticate (the content of the key). Required only if PASSWORD is not provided."
+    description: "Private ssh key used to authenticate (the content of the key). Can be used alone or together with PASSWORD."
     required: false
   PASSWORD:
-    description: "SSH password used to authenticate. Required only if KEY is not provided. sshpass is installed automatically on the runner."
+    description: "SSH password used to authenticate. Can be used alone or together with KEY. sshpass is installed automatically on the runner."
     required: false
   REPO:
     description: "Specify the name of the repository where the action is located."
@@ -47,6 +47,8 @@ runs:
       shell: bash
     - name: 📦 Installing sshpass (password mode)...
       if: inputs.PASSWORD != ''
+      env:
+        SSH_KEY: ${{ inputs.KEY }}
       run: |
         if command -v sshpass >/dev/null 2>&1; then
           echo "sshpass is already available."
@@ -56,21 +58,34 @@ runs:
         if [ "$(id -u)" -ne 0 ]; then
           SUDO="sudo"
         fi
-        if command -v apt-get >/dev/null 2>&1; then
-          $SUDO apt-get update -qq
-          $SUDO apt-get install -y -qq sshpass
-        elif command -v apk >/dev/null 2>&1; then
-          $SUDO apk add --no-cache sshpass
-        elif command -v dnf >/dev/null 2>&1; then
-          $SUDO dnf install -y sshpass
-        elif command -v yum >/dev/null 2>&1; then
-          $SUDO yum install -y sshpass
-        elif command -v brew >/dev/null 2>&1; then
-          brew install hudochenkov/sshpass/sshpass
-        else
-          echo "::error::Could not install sshpass, use 'KEY' instead or install sshpass manually."
-          exit 1
+        install_sshpass() {
+          if command -v apt-get >/dev/null 2>&1; then
+            $SUDO apt-get update -qq
+            $SUDO apt-get install -y -qq sshpass
+          elif command -v apk >/dev/null 2>&1; then
+            $SUDO apk add --no-cache sshpass
+          elif command -v dnf >/dev/null 2>&1; then
+            $SUDO dnf install -y sshpass
+          elif command -v yum >/dev/null 2>&1; then
+            $SUDO yum install -y sshpass
+          elif command -v brew >/dev/null 2>&1; then
+            brew install hudochenkov/sshpass/sshpass
+          else
+            return 1
+          fi
+        }
+        if install_sshpass; then
+          echo "sshpass installed."
+          exit 0
         fi
+        # sshpass could not be installed: if a KEY was also provided, keep
+        # going (key auth still works and the password becomes unavailable).
+        if [ -n "$SSH_KEY" ]; then
+          echo "::warning::Could not install sshpass. Falling back to 'KEY' authentication only."
+          exit 0
+        fi
+        echo "::error::Could not install sshpass. Provide 'KEY' instead or install sshpass manually."
+        exit 1
       shell: bash
     - name: 🗿 Creating ssh files...
       if: inputs.KEY != ''
@@ -100,6 +115,9 @@ runs:
           if [ -n "$SSH_KEY" ]; then
             echo "  IdentityFile ~/.ssh/ssh.key"
             echo "  IdentitiesOnly yes"
+            if [ -n "$SSH_PASSWORD" ]; then
+              echo "  PreferredAuthentications publickey,password"
+            fi
           fi
           if [ -z "$SSH_KEY" ] && [ -n "$SSH_PASSWORD" ]; then
             echo "  PreferredAuthentications password"
@@ -120,7 +138,7 @@ runs:
         SSH_FOLDER: ${{ inputs.FOLDER }}
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-        if [ -n "$SSHPASS" ]; then
+        if [ -n "$SSHPASS" ] && command -v sshpass >/dev/null 2>&1; then
           sshpass -e ssh ssh rm -rf "$SSH_FOLDER"
         else
           ssh ssh rm -rf "$SSH_FOLDER"
@@ -136,7 +154,7 @@ runs:
         cd ..
         REPO_NAME="${SSH_REPO##*/}"
         echo "enviando: $REPO_NAME -> ssh:$SSH_FOLDER"
-        if [ -n "$SSHPASS" ]; then
+        if [ -n "$SSHPASS" ] && command -v sshpass >/dev/null 2>&1; then
           sshpass -e scp -r "$REPO_NAME" "ssh:$SSH_FOLDER"
         else
           scp -r "$REPO_NAME" "ssh:$SSH_FOLDER"
@@ -152,7 +170,7 @@ runs:
         cd ..
         REPO_NAME="${SSH_REPO##*/}"
         echo "enviando: $REPO_NAME -> ssh:$SSH_FOLDER"
-        if [ -n "$SSHPASS" ]; then
+        if [ -n "$SSHPASS" ] && command -v sshpass >/dev/null 2>&1; then
           sshpass -e scp -O -r "$REPO_NAME" "ssh:$SSH_FOLDER"
         else
           scp -O -r "$REPO_NAME" "ssh:$SSH_FOLDER"
@@ -164,7 +182,7 @@ runs:
         SSH_RUN: ${{ inputs.RUN }}
         SSHPASS: ${{ inputs.PASSWORD }}
       run: |
-        if [ -n "$SSHPASS" ]; then
+        if [ -n "$SSHPASS" ] && command -v sshpass >/dev/null 2>&1; then
           sshpass -e ssh ssh "$SSH_RUN"
         else
           ssh ssh "$SSH_RUN"

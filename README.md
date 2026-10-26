@@ -28,7 +28,7 @@
 
  • If you want to use several commands, separate them with `&` or `;`.
 
- • You must provide **one** authentication method: `KEY` (private key) or `PASSWORD`. If both are provided, `KEY` is used first and `PASSWORD` as fallback.
+ • You must provide **one** authentication method: `KEY` (private key) or `PASSWORD` — or **both at the same time**: the key authenticates, and the password is there too if you need it.
 
  • The password mode uses [sshpass](https://sourceforge.net/projects/sshpass/), which is installed automatically on the runner (`apt`, `apk`, `dnf`, `yum` or `brew`).
 
@@ -77,6 +77,22 @@ jobs:
           RUN: "ls -a; pwd"
   ```
 
+## example with key + password
+
+Provide both `KEY` and `PASSWORD` at the same time — the action accepts the two together.
+
+```yml
+      - name: 🌈 Deploy with ssh key and password...
+        uses: sebastianjnuwu/ssh-action-deploy@v5
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          FOLDER: "/root/.deploy"
+          RUN: "ls -a; pwd"
+  ```
+
   > The password is passed to `sshpass` through the `SSHPASS` environment variable (not on the command line), so it does not show up in the process list.
 
 ## example running commands only (no file deploy)
@@ -85,7 +101,7 @@ Omit `FOLDER` and use only `RUN`:
 
 ```yml
       - name: 🌈 Execute commands...
-        uses: sebastianjnuwu/ssh-action-deploy@v6
+        uses: sebastianjnuwu/ssh-action-deploy@v5
         with:
           IP: ${{ secrets.IP }}
           USER: ${{ secrets.USER }}
