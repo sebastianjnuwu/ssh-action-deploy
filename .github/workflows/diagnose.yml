@@ -1,0 +1,44 @@
+name: 🔬 diagnose connectivity
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    name: 🔬 runner -> vps
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🌐 IP publico do runner
+        run: curl -s --max-time 10 https://api.ipify.org; echo
+
+      - name: 🔍 o secret IP bate com a VPS atual?
+        env:
+          SECRET_IP: ${{ secrets.IP }}
+        run: |
+          if [ "$SECRET_IP" = "15.204.175.170" ]; then
+            echo "MATCH: secret IP = 15.204.175.170"
+          else
+            echo "DIFFERENT: secret IP nao e 15.204.175.170 (valor comeco: ${SECRET_IP:0:6}...)"
+          fi
+          if [ -z "$SECRET_IP" ]; then
+            echo "SECRET IP VAZIO!"
+          fi
+
+      - name: 🧪 TCP test porta 22
+        env:
+          SECRET_IP: ${{ secrets.IP }}
+        run: |
+          timeout 10 bash -c "echo > /dev/tcp/$SECRET_IP/22" 2>/dev/null && echo "PORTA 22 ABERTA" || echo "PORTA 22 FALHOU/TIMEOUT"
+
+      - name: 🧪 SSH handshake test
+        env:
+          SECRET_IP: ${{ secrets.IP }}
+        run: |
+          timeout 15 ssh -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes -o ConnectTimeout=10 root@$SECRET_IP exit 2>&1 | grep -E "Connecting|Connection|refused|timed|established|kex_exchange|Permission" | head -15
+          echo "exit: $?"
+
+      - name: 🧪 porta 443 como referencia
+        env:
+          SECRET_IP: ${{ secrets.IP }}
+        run: |
+          timeout 10 bash -c "echo > /dev/tcp/$SECRET_IP/443" 2>/dev/null && echo "PORTA 443 ABERTA" || echo "PORTA 443 FALHOU (pode estar fechada, so referencia)"
