@@ -22,8 +22,8 @@ inputs:
     description: "Specify the name of the repository where the action is located."
     default: ${{ github.repository }}
   FOLDER:
-    description: 'Name of the folder where the files are located, including the user (e.g., "user/deploy").'
-    required: true
+    description: 'Optional destination folder, including the user (e.g., "user/deploy"). If empty, no files are copied or deleted; only RUN is executed.'
+    required: false
   RUN:
     description: "Specify the commands to be executed after the deploy."
     required: false
@@ -108,7 +108,14 @@ runs:
         } >> ~/.ssh/config
         chmod 600 ~/.ssh/config
       shell: bash
+    - name: 🧭 Validating deploy inputs...
+      if: inputs.FOLDER == '' && inputs.RUN == ''
+      run: |
+        echo "::error::Provide FOLDER, RUN, or both."
+        exit 1
+      shell: bash
     - name: ✨ Removing old files...
+      if: inputs.FOLDER != ''
       env:
         SSH_FOLDER: ${{ inputs.FOLDER }}
         SSHPASS: ${{ inputs.PASSWORD }}
@@ -120,7 +127,7 @@ runs:
         fi
       shell: bash
     - name: 💧 deploy to vps...
-      if: inputs.COMPATABILITY != 'true'
+      if: inputs.FOLDER != '' && inputs.COMPATABILITY != 'true'
       env:
         SSH_REPO: ${{ inputs.REPO }}
         SSH_FOLDER: ${{ inputs.FOLDER }}
@@ -136,7 +143,7 @@ runs:
         fi
       shell: bash
     - name: 💧 deploy to vps with compatability...
-      if: inputs.COMPATABILITY == 'true'
+      if: inputs.FOLDER != '' && inputs.COMPATABILITY == 'true'
       env:
         SSH_REPO: ${{ inputs.REPO }}
         SSH_FOLDER: ${{ inputs.FOLDER }}
