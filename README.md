@@ -20,7 +20,9 @@
 
  Read this before running <strong>ssh-action-deploy</strong>
  
- • During deploy the folder you put in is cleaned.
+ • If `FOLDER` is provided, it is cleaned before the copy. Leave it empty to only execute commands (no file deploy).
+ 
+ • `FOLDER` is optional. If omitted, the action only runs `RUN`.
  
  • We use the default ssh port (22) to execute the deploy
 
@@ -77,6 +79,21 @@ jobs:
 
   > The password is passed to `sshpass` through the `SSHPASS` environment variable (not on the command line), so it does not show up in the process list.
 
+## example running commands only (no file deploy)
+
+Omit `FOLDER` and use only `RUN`:
+
+```yml
+      - name: 🌈 Execute commands...
+        uses: sebastianjnuwu/ssh-action-deploy@v6
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          RUN: "cd /root/docker && docker compose ps"
+```
+
+
 ## variables 
 
 | variable | example  | require |
@@ -85,5 +102,5 @@ jobs:
 | `USER` | `root` | `true` |
 | `KEY` | `xxxxxx` | `false` (required if `PASSWORD` is empty) |
 | `PASSWORD` | `xxxxxx` | `false` (required if `KEY` is empty) |
-| `FOLDER` | `/root/.deploy`| `true` |
+| `FOLDER` | `/root/.deploy`| `false` |
 | `RUN` | `uptime` | `false` |
