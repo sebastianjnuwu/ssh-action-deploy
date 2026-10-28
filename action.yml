@@ -137,6 +137,23 @@ runs:
         echo "::error::Provide FOLDER, RUN, or both."
         exit 1
       shell: bash
+    - name: 🧷 Validating FOLDER...
+      if: inputs.FOLDER != ''
+      env:
+        SSH_FOLDER: ${{ inputs.FOLDER }}
+      run: |
+        normalized="${SSH_FOLDER%/}"
+        unsafe() {
+          echo "::error::Refusing FOLDER '$SSH_FOLDER': $1."
+          exit 1
+        }
+        case "$normalized" in
+          *[!A-Za-z0-9._/~-]*) unsafe "only letters, numbers, '.', '_', '/', '~' and '-' are allowed" ;;
+          ""|"/"|"."|"~"|"\$HOME"|*..*) unsafe "unsafe path" ;;
+          "/root"|"/home"|"/etc"|"/usr"|"/var"|"/bin"|"/sbin"|"/boot"|"/dev"|"/proc"|"/sys"|"/lib"|"/lib64"|"/opt"|"/srv"|"/tmp"|"/run"|"/media"|"/mnt") unsafe "system directory" ;;
+        esac
+        echo "FOLDER accepted: $SSH_FOLDER"
+      shell: bash
     - name: ✨ Removing old files...
       if: inputs.FOLDER != ''
       env:

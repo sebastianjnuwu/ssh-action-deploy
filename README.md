@@ -22,6 +22,10 @@
  
  • If `FOLDER` is provided, it is cleaned before the copy. Leave it empty to only execute commands (no file deploy).
  
+ • `FOLDER` is validated before the cleanup: `/`, `~`, `..`, system directories and paths with special characters are rejected, so a typo cannot wipe the server.
+
+ • `FOLDER` must contain only letters, numbers, `.`, `_`, `/`, `~` and `-` (no spaces).
+ 
  • `FOLDER` is optional. If omitted, the action only runs `RUN`.
  
  • The ssh port is `22` by default. Set `PORT` to deploy on a different port.
