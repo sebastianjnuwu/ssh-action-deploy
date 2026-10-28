@@ -12,6 +12,10 @@ inputs:
   USER:
     description: "A user is an agent, either a human agent or a software agent, who uses a computer or network service."
     required: true
+  PORT:
+    description: "SSH port of the remote host. Defaults to 22 when empty."
+    required: false
+    default: "22"
   KEY:
     description: "Private ssh key used to authenticate (the content of the key). Can be used alone or together with PASSWORD."
     required: false
@@ -100,6 +104,7 @@ runs:
       env:
         SSH_HOST: ${{ inputs.IP }}
         SSH_USER: ${{ inputs.USER }}
+        SSH_PORT: ${{ inputs.PORT }}
         SSH_KEY: ${{ inputs.KEY }}
         SSH_PASSWORD: ${{ inputs.PASSWORD }}
       run: |
@@ -109,7 +114,7 @@ runs:
           echo "Host ssh"
           echo "  HostName $SSH_HOST"
           echo "  User $SSH_USER"
-          echo "  Port 22"
+          echo "  Port ${SSH_PORT:-22}"
           echo "  StrictHostKeyChecking no"
           echo "  UserKnownHostsFile /dev/null"
           if [ -n "$SSH_KEY" ]; then

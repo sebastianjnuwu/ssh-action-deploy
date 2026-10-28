@@ -24,7 +24,7 @@
  
  • `FOLDER` is optional. If omitted, the action only runs `RUN`.
  
- • We use the default ssh port (22) to execute the deploy
+ • The ssh port is `22` by default. Set `PORT` to deploy on a different port.
 
  • If you want to use several commands, separate them with `&` or `;`.
 
@@ -110,12 +110,28 @@ Omit `FOLDER` and use only `RUN`:
 ```
 
 
+## example with a custom ssh port
+
+`PORT` is optional and defaults to `22`. Use it when the server listens on another port:
+
+```yml
+      - name: 🌈 Execute commands on a custom port...
+        uses: sebastianjnuwu/ssh-action-deploy@v5
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          PORT: "2222"
+          PASSWORD: ${{ secrets.PASSWORD }}
+          RUN: "uptime"
+  ```
+
 ## variables 
 
 | variable | example  | require |
 | -------- | ----------- | ------- |
 | `IP` | `1.1.1.1`| `true` |
 | `USER` | `root` | `true` |
+| `PORT` | `22` | `false` (default `22`) |
 | `KEY` | `xxxxxx` | `false` (required if `PASSWORD` is empty) |
 | `PASSWORD` | `xxxxxx` | `false` (required if `KEY` is empty) |
 | `FOLDER` | `/root/.deploy`| `false` |
