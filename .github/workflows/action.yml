@@ -80,6 +80,61 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
           RUN: "echo RUN-ONLY-OK; uptime"
 
+  run_only_port:
+    name: 🔌 cmd com PORT explícita (22)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 executa com PORT=22
+        uses: ./
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          PORT: "22"
+          RUN: "echo PORT-22-OK; whoami"
+
+  run_only_port_empty:
+    name: 🔌 cmd com PORT vazia (fallback 22)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 executa com PORT vazia
+        uses: ./
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          PORT: ""
+          RUN: "echo PORT-EMPTY-OK; whoami"
+
+  unsafe_folder:
+    name: 🛡️ FOLDER perigoso (deve falhar)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 💞 checkout
+        uses: actions/checkout@v3
+      - name: 🌈 tenta limpar FOLDER=/
+        id: expect_fail
+        uses: ./
+        continue-on-error: true
+        with:
+          IP: ${{ secrets.IP }}
+          USER: ${{ secrets.USER }}
+          KEY: ${{ secrets.KEY }}
+          FOLDER: "/"
+          RUN: "echo SHOULD-NOT-RUN"
+      - name: 🧪 verifica que recusou
+        run: |
+          if [ "${{ steps.expect_fail.outcome }}" != "failure" ]; then
+            echo "::error::Action should refuse FOLDER=/."
+            exit 1
+          fi
+          echo "OK: recusou FOLDER=/."
+
   neither:
     name: ❌ sem pasta e sem cmd (deve falhar)
     runs-on: ubuntu-latest
